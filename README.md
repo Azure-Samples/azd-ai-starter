@@ -14,7 +14,7 @@ description: Creates an Azure AI Service and deploys the specified models.
 # Azure AI Starter Template
 
 ### Quickstart
-To learn how to get started with any template, follow the steps in [this quickstart](https://learn.microsoft.com/azure/developer/azure-developer-cli/get-started?tabs=localinstall&pivots=programming-language-nodejs) with this template(`wbreza/azd-ai-starter`)
+To learn how to get started with any template, follow the steps in [this quickstart](https://learn.microsoft.com/azure/developer/azure-developer-cli/get-started?tabs=localinstall&pivots=programming-language-nodejs) with this template(`Azure-Samples/azd-ai-starter`)
 
 This quickstart will show you how to authenticate on Azure, initialize using a template, provision infrastructure and deploy code on Azure via the following commands:
 
@@ -23,7 +23,7 @@ This quickstart will show you how to authenticate on Azure, initialize using a t
 azd auth login
 
 # First-time project setup. Initialize a project in the current directory, using this template. 
-azd init --template wbreza/azd-ai-starter
+azd init --template Azure-Samples/azd-ai-starter
 
 # Provision and deploy to Azure
 azd up
