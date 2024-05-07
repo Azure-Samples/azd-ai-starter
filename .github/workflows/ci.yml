@@ -1,0 +1,77 @@
+name: AI Gallery Template CI Validation
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        # This is the version of the action for setting up Python, not the Python version.
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      - name: Install AZD
+        uses: Azure/setup-azd@v1.0.0
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+      
+      - name: Log in with Azure (Federated Credentials)
+        if: ${{ env.AZURE_CLIENT_ID != '' }}
+        run: |
+          azd auth login `
+            --client-id "$Env:AZURE_CLIENT_ID" `
+            --federated-credential-provider "github" `
+            --tenant-id "$Env:AZURE_TENANT_ID"
+          azd env set CREATE_ROLE_FOR_USER false --no-prompt
+        shell: pwsh
+
+      - name: Run validation
+        run: |
+          python .github/validator/validator.py . --azdup --azddown --output .github/validator/output.log --debug
+
+      - name: Read file content
+        if: always()
+        id: read_validation_result
+        run: |
+          FILE_CONTENT=$(cat .github/validator/output.log)
+          echo "file_content<<EOF" >> $GITHUB_ENV
+          echo "$FILE_CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Post comment on PR
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILE_CONTENT: ${{ env.file_content }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "${{ env.FILE_CONTENT }}"
