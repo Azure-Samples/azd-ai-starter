@@ -9,5 +9,9 @@ workflows:
       - azd: provision
 hooks:
   postprovision:
-    shell: sh
-    run: ./hooks/postprovision.sh
+    windows:
+      shell: pwsh
+      run: ./hooks/postprovision.ps1
+    posix:
+      shell: sh
+      run: ./hooks/postprovision.sh
