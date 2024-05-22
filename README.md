@@ -44,7 +44,7 @@ For a list of supported models see [Azure OpenAI Service Models documentation](h
 By default this template will use a default naming convention to prevent naming collisions within Azure.
 To override default naming conventions the following can be set.
 
-- `AZURE_OPENAI_NAME` - The name of the Azure Open AI service
+- `AZURE_OPENAI_NAME` - The name of the Azure OpenAI service
 
 Run `azd config set <key> <value>` after initializing the template to override the resource names
 
