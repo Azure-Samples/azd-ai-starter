@@ -3,41 +3,61 @@
 > [!IMPORTANT]
 > This file provides guidelines to complete setup after scaffolding and to validate your codebase. Feel free to remove this file.
 
-### Quickstart
-To learn how to get started with any template, follow the steps in [this quickstart](https://learn.microsoft.com/azure/developer/azure-developer-cli/get-started?tabs=localinstall&pivots=programming-language-nodejs) with this template(`Azure-Samples/azd-ai-starter`)
+## Standards and conventions
 
-This quickstart will show you how to authenticate on Azure, initialize using a template, provision infrastructure and deploy code on Azure via the following commands:
+For a complete set of standards and conventions that will guarantee successful template validation, [visit this repository](https://github.com/Azure-Samples/azd-template-artifacts)
 
-```bash
-# Log in to azd. Only required once per-install.
-azd auth login
+## Getting started
 
-# First-time project setup. Initialize a project in the current directory, using this template. 
-azd init --template Azure-Samples/azd-ai-starter
+Before you get started please make sure to have the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) installed. You may also need to meet all requirements in the [readme.md](./README.md) file.
 
-# Provision and deploy to Azure
-azd up
-```
+### Step 1 - Scaffolding
 
-### Provisioned Azure Resources
+To proceed with scaffolding using the terminal, change local directory to the desired one, 
 
-This template creates the following resources:
+`cd [my-project-directory]`
 
-- [OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/)
+and run
 
-The provisioning will also deploy any models specified within the `./infra/ai.yaml`.
+`azd init --template [name-of-template]`
 
-For a list of supported models see [Azure OpenAI Service Models documentation](https://learn.microsoft.com/azure/ai-services/openai/concepts/models)
+in this case, `[name-of-template]` is `azd-ai-starter`. This will clone the repo files to your directory, including all those Infrastructure as Code files necessary for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) to provision, build, and deploy your application.
 
-### Optional Configuration
+### Step 2 - Provisioning AI resources
 
-By default this template will use a default naming convention to prevent naming collisions within Azure.
-To override default naming conventions the following can be set.
+Now you can provision the necessary Azure resources, by running
 
-- `AZURE_OPENAI_NAME` - The name of the Azure Open AI service
+`azd provision`
 
-Run `azd config set <key> <value>` after initializing the template to override the resource names
+You may need to be logged in to Azure. Follow instructions in the [Deploy to Azure](./README.md#quickstart) section of the [readme.md](./README.md) file.
+
+> [!TIP]
+> You may want to check available regions and quota by running the provided [script](#).
+
+### Step 3 - Develop your application
+
+Once your Azure OpenAI resources are provisioned, you may want to continue developing your application, as per your requirments and specifications. You may want to refer to our [operational guidelines](https://github.com/Azure-Samples/azd-template-artifacts/blob/main/docs/development-guidelines/operational-guidelines.md) that provide guidance to succeed when developing application samples.
+
+Make sure to implement the right tools for local testing.
+
+### Step 4 - Deploy your application to the cloud
+
+Once your application development is complete and local testing has succeeded, add or update your Bicep files and the corresponding [azure.yaml](./azure.yaml) configuration to complete your application deployment to Azure. When done, run
+
+`azd up`
+
+This will provision all required resources to host your application and run compute when necessary, and deploy all artifacts to Azure. You may be prompted to select again a region for those resources.
+
+When the deployment is complete, you can test your application in the cloud.
+
+### Step 5 - Validation and template publishing
+
+Commit and push your code changes to your repository on [GitHub](https://github.com/), to run the `validation` workflow. The workflow will create a `Success criteria` issue in your repository, and check the passing criteria.
+
+If it succeeds and all success criteria is met, you're ready to create a pull request to the [AI Gallery](https://azure.github.io/ai-apps/) following these guidelines [TBD](#)
+
+If the validation fails, the system will create the corresponding in your repository. Before you open a PR, you will need to fix all issues and close them and mark the corresponding criteria passed, as well as run the validation worflow manually, again.
 
 ## Reporting Issues and Feedback
 
-If you have any feature requests, issues, or areas for improvement, please [file an issue](https://aka.ms/azure-dev/issues). To keep up-to-date, ask questions, or share suggestions, join our [GitHub Discussions](https://aka.ms/azure-dev/discussions). You may also contact us via AzDevTeam@microsoft.com.
+If you have any feature requests, issues, or areas for improvement, please [file an issue](https://aka.ms/azure-dev/issues). To keep up-to-date, ask questions, or share suggestions, join our [GitHub Discussions](https://aka.ms/azure-dev/discussions). You may also contact us via AzDevTeam@microsoft.com. -->
