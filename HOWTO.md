@@ -42,7 +42,13 @@ Make sure to implement the right tools for local testing.
 
 ### Step 4 - Deploy your application to the cloud
 
-Once your application development is complete and local testing has succeeded, add or update your Bicep files and the corresponding [azure.yaml](./azure.yaml) configuration to complete your application deployment to Azure. When done, run
+Once your application development is complete and local testing has succeeded, add or update your Bicep files and the corresponding [azure.yaml](./azure.yaml) configuration to complete your application deployment to Azure. 
+
+#### API Version Information
+
+You can run the[listApiVersions](./scripts/listApiVersions.sh) or [listApiVersions](./scripts/listApiVersions.ps1) script, for your corresponding platform, to get a list of available Bicep APIs
+
+When done, run
 
 `azd up`
 
@@ -60,4 +66,4 @@ If the validation fails, the system will create the corresponding in your reposi
 
 ## Reporting Issues and Feedback
 
-If you have any feature requests, issues, or areas for improvement, please [file an issue](https://aka.ms/azure-dev/issues). To keep up-to-date, ask questions, or share suggestions, join our [GitHub Discussions](https://aka.ms/azure-dev/discussions). You may also contact us via AzDevTeam@microsoft.com. -->
+If you have any feature requests, issues, or areas for improvement, please [file an issue](https://github.com/Azure-Samples/azd-template-artifacts/issues), including the template you're reporting issues for.
