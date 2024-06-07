@@ -1,5 +1,8 @@
 # Azure AI Starter Template
 
+> [!IMPORTANT]
+> This file provides guidelines to complete setup after scaffolding and to validate your codebase. Feel free to remove this file.
+
 ### Quickstart
 To learn how to get started with any template, follow the steps in [this quickstart](https://learn.microsoft.com/azure/developer/azure-developer-cli/get-started?tabs=localinstall&pivots=programming-language-nodejs) with this template(`Azure-Samples/azd-ai-starter`)
 
