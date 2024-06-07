@@ -1,16 +1,3 @@
----
-page_type: sample
-languages:
-- azdeveloper
-- bicep
-products:
-- azure
-urlFragment: azd-ai-starter
-name: Azure AI starter template
-description: Creates an Azure AI Service and deploys the specified models.
----
-<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
-
 # Azure AI Starter Template
 
 ### Quickstart
