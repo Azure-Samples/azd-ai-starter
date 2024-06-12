@@ -60,7 +60,7 @@ When the deployment is complete, you can test your application in the cloud.
 
 Commit and push your code changes to your repository on [GitHub](https://github.com/), to run the `validation` workflow. The workflow will create a `Success criteria` issue in your repository, and check the passing criteria.
 
-If it succeeds and all success criteria is met, you're ready to create a pull request to the [AI Gallery](https://azure.github.io/ai-apps/) following these guidelines [TBD](#)
+If it succeeds and all success criteria is met, you're ready to submit your template to one of the [awesome-azd ](https://azure.github.io/awesome-azd) collections.
 
 If the validation fails, the system will create the corresponding in your repository. Before you open a PR, you will need to fix all issues and close them and mark the corresponding criteria passed, as well as run the validation worflow manually, again.
 
