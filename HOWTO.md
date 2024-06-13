@@ -21,7 +21,7 @@ and run
 
 `azd init --template [name-of-template]`
 
-in this case, `[name-of-template]` is `azd-ai-starter`. This will clone the repo files to your directory, including all those Infrastructure as Code files necessary for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) to provision, build, and deploy your application.
+in this case, `[name-of-template]` is `azd-ai-starter`. This will clone the repo files to your directory, including all those Infrastructure as Code files necessary for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) to provision Azure OpenAI resources.
 
 ### Step 2 - Provisioning AI resources
 
