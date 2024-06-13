@@ -62,7 +62,7 @@ Commit and push your code changes to your repository on [GitHub](https://github.
 
 If it succeeds and all success criteria is met, you're ready to submit your template to one of the [awesome-azd](https://azure.github.io/awesome-azd) collections.
 
-If the validation fails, the system will create the corresponding in your repository. Before you open a PR, you will need to fix all issues and close them and mark the corresponding criteria passed, as well as run the validation worflow manually, again.
+If the validation fails, the system will create the corresponding issues in your repository. Before you open a pull request, you will need to fix all issues and close them and mark the corresponding criteria passed, as well as run the validation workflow manually, again.
 
 ## Reporting Issues and Feedback
 
