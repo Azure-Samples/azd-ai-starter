@@ -1,0 +1,3 @@
+quart
+openai
+python-dotenv
