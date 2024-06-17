@@ -13,6 +13,13 @@ description: Creates an Azure AI Service and deploys the specified models.
 
 # Azure AI Starter Template
 
+This template contains infrastructure-as-Code (IaC) and other files to help you get started with getting your AI application onto Azure with [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). You will need to add application code and configure the IaC to create and deploy a fully-functioning app.
+
+The following assets are provided:
+
+- Infrastructure-as-code (IaC) Bicep files under the `infra` folder that demonstrate how to provision resources and setup resource tagging for azd.
+- A [dev container](https://containers.dev) configuration file under the `.devcontainer` directory that installs infrastructure tooling by default. This can be readily used to create cloud-hosted developer environments such as [GitHub Codespaces](https://aka.ms/codespaces).
+
 ### Quickstart
 To learn how to get started with any template, follow the steps in [this quickstart](https://learn.microsoft.com/azure/developer/azure-developer-cli/get-started?tabs=localinstall&pivots=programming-language-nodejs) with this template(`Azure-Samples/azd-ai-starter`)
 
