@@ -1,3 +1,4 @@
 quart
 openai
 python-dotenv
+azure-identity
