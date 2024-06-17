@@ -1,1 +1,10 @@
+# Azure Developer CLI generated folder
+# including environment variables
 .azure
+
+# .vscode generated folder
+.vscode
+
+# other env variable definitions
+.env
+*.env
