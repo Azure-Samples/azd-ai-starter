@@ -7,15 +7,15 @@ import yaml
 azure_dev_workflow_file_path = ".github/workflows/azure-dev.yml"
 ci_workflow_file_path = ".github/workflows/pr-gate.yml"
 change_log_file_path = "CHANGELOG.md"
-code_of_conduct_file_path = ".gethub/CODE_OF_CONDUCT.md"
+code_of_conduct_file_path = ".github/CODE_OF_CONDUCT.md"
 contributing_file_path = "CONTRIBUTING.md"
 issue_template_file_path = ".github/ISSUE_TEMPLATE.md"
 license_file_path = "LICENSE"
 readme_file_path = "README.md"
 security_file_path = "SECURITY.md"
-infra_bicep_file_path = "infra/main.bicep"
 infra_yaml_file_path = "azure.yaml"
 
+infra_folder_path = "infra"
 devcontainer_folder_path = ".devcontainer"
 cicd_workflow_folder_path = ".github/workflows"
 
@@ -25,18 +25,6 @@ readme_h2_tags = [
     "## Getting Started",
     "## Guidance",
     "## Resources"
-]
-
-# The list of files need to be check for existence
-existence_check_files = [
-    contributing_file_path,
-    change_log_file_path,
-    license_file_path,
-    readme_file_path,
-    security_file_path,
-    infra_bicep_file_path,
-    infra_yaml_file_path,
-    ci_workflow_file_path
 ]
 
 repository_management_files = [
@@ -51,11 +39,11 @@ repository_management_files = [
 source_code_structure_files = [
     azure_dev_workflow_file_path,
     ci_workflow_file_path,
-    infra_bicep_file_path,
     infra_yaml_file_path,
 ]
 
 source_code_structure_folders = [
+    infra_folder_path,
     devcontainer_folder_path
 ]
 
@@ -96,23 +84,6 @@ def check_for_azd_up(folder_path):
         message.append(
             f"- [ ] azd up")
         message.append(f"Error: {e.stdout}")
-        return False, line_delimiter.join(message),
-
-
-def check_for_bicep_lint(folder_path):
-    logging.debug(f"Checking with az bicep build...")
-    try:
-        command = f"az bicep build --file {os.path.join(folder_path, infra_bicep_file_path)} --stdout"
-        result = subprocess.run(
-            command, capture_output=True, text=True, check=True, shell=True)
-        logging.debug(f"{result.stdout}")
-        return True, f"- [x] {infra_bicep_file_path} content validation.",
-    except subprocess.CalledProcessError as e:
-        logging.warning(f"{e.stderr}")
-        message = []
-        message.append(
-            f"- [ ] {infra_bicep_file_path} content validation.")
-        message.append(f"Error: {e}")
         return False, line_delimiter.join(message),
 
 
@@ -160,11 +131,11 @@ def check_folder_existence(repo_path, folder_name):
     logging.debug(f"Checking for {folder_name}...")
     message = []
     if not os.path.isdir(os.path.join(repo_path, folder_name)):
-        message.append(f"- [ ] {folder_name} is in place.")
-        message.append(f"Error: {folder_name} is missing.")
+        message.append(f"- [ ] {folder_name} folder is in place.")
+        message.append(f"Error: {folder_name} folder is missing.")
         return False, line_delimiter.join(message)
     else:
-        message.append(f"- [x] {folder_name} is in place.")
+        message.append(f"- [x] {folder_name} folder is in place.")
         return True, line_delimiter.join(message)
 
 
@@ -172,8 +143,8 @@ def check_file_existence(repo_path, file_name, h2_tags=None):
     logging.debug(f"Checking for {file_name}...")
     message = []
     if not os.path.isfile(os.path.join(repo_path, file_name)):
-        message.append(f"- [ ] {file_name} is in place.")
-        message.append(f"Error: {file_name} is missing.")
+        message.append(f"- [ ] {file_name} file is in place.")
+        message.append(f"Error: {file_name} file is missing.")
         return False, line_delimiter.join(message)
     else:
         result = True
@@ -189,10 +160,10 @@ def check_file_existence(repo_path, file_name, h2_tags=None):
             file.close()
 
         if result == False:
-            message.append(f"- [ ] {file_name} is in place.")
+            message.append(f"- [ ] {file_name} file is in place.")
             message.extend(subMessage)
         else:
-            message.append(f"- [x] {file_name} is in place.")
+            message.append(f"- [x] {file_name} file is in place.")
         return result, line_delimiter.join(message)
 
 
@@ -248,10 +219,6 @@ def check_for_functional_requirements(repo_path, check_azd_up, check_azd_down):
             result, message = check_for_azd_down(repo_path)
             final_result = final_result and result
             final_message.append(message)
-    else:
-        result, message = check_for_bicep_lint(repo_path)
-        final_result = final_result and result
-        final_message.append(message)
 
     return final_result, line_delimiter.join(final_message)
 
