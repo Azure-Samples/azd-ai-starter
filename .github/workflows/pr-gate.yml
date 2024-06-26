@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 permissions:
   contents: read
   id-token: write
@@ -59,6 +58,21 @@ jobs:
         with:
           sarif_file: ${{ steps.msdo.outputs.sarifFile }}
 
+      - name: Get repository topics
+        id: get_repo_topics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$GITHUB_REPOSITORY/topics | jq -r '.names | join(",")')
+          echo "topics=$topics_list" >> $GITHUB_ENV
+
+      - name: Set environment name with timestamp
+        id: set_env_name
+        run: |
+          current_time=$(date +%m%d%H%M)
+          azure_env_name="${{ vars.AZURE_ENV_NAME }}-$current_time"
+          echo "AZURE_ENV_NAME=$azure_env_name" >> $GITHUB_ENV
+
       - name: Log in with Azure (Federated Credentials)
         if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
@@ -69,12 +83,13 @@ jobs:
         shell: pwsh
 
       - name: Run validation
-        run:  python .github/validator/validator.py . --azdup --azddown --output .github/validator/output.log --debug
+        run: python .github/validator/validator.py . --azdup --azddown --output .github/validator/output.log --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --debug
         env:
-          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+          AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           CREATE_IN_LOCAL: false
+          TOPICS: ${{ env.topics }}
 
       - name: Read file content
         if: always()
