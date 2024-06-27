@@ -15,7 +15,7 @@ param sku object = {
 
 param allowedIpRules array = []
 param networkAcls object = empty(allowedIpRules) ? {
-  defaultAction: 'Allow'
+  defaultAction: 'Deny'
 } : {
   ipRules: allowedIpRules
   defaultAction: 'Deny'
@@ -30,6 +30,7 @@ resource account 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
     customSubDomainName: customSubDomainName
     publicNetworkAccess: publicNetworkAccess
     networkAcls: networkAcls
+    disableLocalAuth: true
   }
   sku: sku
 }
