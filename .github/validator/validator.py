@@ -125,7 +125,9 @@ def check_msdo_result(msdo_result_file):
 
 def check_for_azd_down(folder_path):
     logging.debug(f"Checking with azd down...")
+    original_directory = os.getcwd()
     try:
+        os.chdir(folder_path)
         command = f"azd down --force --purge"
         result = subprocess.run(
             command, capture_output=True, text=True, check=True, shell=True)
@@ -134,11 +136,15 @@ def check_for_azd_down(folder_path):
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
         return False, ItemResultFormat.FAIL.format(message="azd down", detail_messages=f"Error: {e.stdout}")
+    finally:
+        os.chdir(original_directory)
 
 
 def check_for_azd_up(folder_path):
     logging.debug(f"Checking with azd up...")
+    original_directory = os.getcwd()
     try:
+        os.chdir(folder_path)
         command = f"azd up --no-prompt"
         result = subprocess.run(
             command, capture_output=True, text=True, check=True, shell=True)
@@ -147,6 +153,8 @@ def check_for_azd_up(folder_path):
     except subprocess.CalledProcessError as e:
         logging.debug(f"{e.stdout}")
         return False, ItemResultFormat.FAIL.format(message="azd up", detail_messages=f"Error: {e.stdout}")
+    finally:
+        os.chdir(original_directory)
 
 
 def check_for_actions_in_workflow_file(repo_path, file_name, actions):
@@ -177,8 +185,8 @@ def check_for_actions_in_workflow_file(repo_path, file_name, actions):
 
 
 def find_cicd_workflow_file(repo_path):
-    # return all yaml files in the /gethub/workflows folder as a list
-    result, message = check_folder_existence(
+    # return all yaml files in the /github/workflows folder as a list
+    result = check_folder_existence(
         repo_path, cicd_workflow_folder_path)
     list = []
     if result:

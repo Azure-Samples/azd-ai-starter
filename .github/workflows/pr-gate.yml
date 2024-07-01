@@ -9,6 +9,7 @@ permissions:
   contents: read
   id-token: write
   pull-requests: write
+  security-events: write
 
 jobs:
   validation:
@@ -45,7 +46,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r .github/validator/requirements.txt
-          chmod +x ./hooks/*.sh
+          if [ -d "./hooks" ] && [ "$(ls -A ./hooks/*.sh 2>/dev/null)" ]; then
+            chmod +x ./hooks/*.sh
+          else
+            echo "No hooks directory or no .sh files found in hooks directory"
+          fi
 
       - name: Run Microsoft Security DevOps Analysis
         uses: microsoft/security-devops-action@v1
@@ -54,6 +59,7 @@ jobs:
           tools: templateanalyzer
 
       - name: Upload results to Security tab
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ${{ steps.msdo.outputs.sarifFile }}
@@ -64,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$GITHUB_REPOSITORY/topics | jq -r '.names | join(",")')
-          echo "topics=$topics_list" >> $GITHUB_ENV
+          echo "topics=\"$topics_list\"" >> $GITHUB_ENV
 
       - name: Set environment name with timestamp
         id: set_env_name
@@ -96,7 +102,7 @@ jobs:
         id: read_validation_result
         run: |
           FILE_CONTENT=$(cat .github/validator/output.log)
-          echo "file_content<<EOF" >> $GITHUB_ENV
+          echo "validation_result<<EOF" >> $GITHUB_ENV
           echo "$FILE_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
@@ -104,6 +110,6 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FILE_CONTENT: ${{ env.file_content }}
+          COMMENT_BODY: ${{ env.validation_result }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "${{ env.FILE_CONTENT }}"
+          gh pr comment ${{ github.event.pull_request.number }} --body "${{ env.COMMENT_BODY }}"
