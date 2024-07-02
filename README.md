@@ -167,7 +167,16 @@ A related option is VS Code Dev Containers, which will open the project in your 
 
 #### Local Development
 
-Describe how to run and develop the app locally
+Describe how to run and develop the app 
+
+#### Extending Bicep IaC files
+
+Once the application is developed, the Bicep files may need to be extended with additional service modules and configuration. We include a script to list the available API versions for each service, including an indicator for latest stable releases.
+
+To use it, change directory to the [scripts folder](./scripts), and locate and run the script called `listAPIVersions`, for your corresponding platform. 
+
+> [!IMPORTANT]
+> This script needs the [Azure CLI] to be installed in your system or available in your setup.
 
 ## Guidance
 
