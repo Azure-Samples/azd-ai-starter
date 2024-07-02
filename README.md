@@ -176,6 +176,15 @@ Describe how to run and develop the app locally
 This template uses [MODEL 1] and [MODEL 2] which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region during deployment accordingly
   * We recommend using [SUGGESTED REGION]
 
+### Quotas
+
+Apart from making sure the selected model is available in a preferred region, you may need to make sure your subscription has remaining quota available. We provide a tool, in the form of a script, for this purpose.
+
+To use it, change directory to the [scripts folder](./scripts), and locate and run the script called `listAIQuotas`, for your corresponding platform. 
+
+> [!IMPORTANT]
+> This script needs the [Azure CLI] to be installed in your system or available in your setup.
+
 ### Costs
 
 You can estimate the cost of this project's architecture with [Azure's pricing calculator](https://azure.microsoft.com/pricing/calculator/)
