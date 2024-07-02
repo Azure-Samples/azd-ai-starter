@@ -39,7 +39,7 @@ repository_management_files = [
 
 source_code_structure_files = [
     azure_dev_workflow_file_path,
-    ci_workflow_file_path,
+#   ci_workflow_file_path,
     infra_yaml_file_path,
 ]
 
