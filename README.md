@@ -15,6 +15,7 @@ description: Creates an Azure AI Service and deploys the specified models.
 > This is a standard readme file defining the required structure for template validation. Update as required, including replacing all instances of [Project Name] with your project's name, and remove this notice.
 > Please make sure to read the [how to](./HOWTO.md) documentation, to learn more about additional setup steps, standardization, conventions and validation steps.
 
+
 # [Project Name]
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](placeholder)
@@ -105,7 +106,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 
 ### Local Environment
 
-#### Prerequisites
+### Prerequisites
 
 (ideally very short, if any)
 
@@ -119,14 +120,14 @@ A related option is VS Code Dev Containers, which will open the project in your 
   * We recommend using [SUGGESTED REGION]
 * ...
 
-#### Installation
+### Installation
 
 (ideally very short)
 
 * list of any prerequisites
 * ...
 
-#### Quickstart
+## Quickstart
 
 (Add steps to get up and running quickly)
 
@@ -165,11 +166,11 @@ A related option is VS Code Dev Containers, which will open the project in your 
     azd pipeline config
     ```
 
-#### Local Development
+### Local Development
 
 Describe how to run and develop the app 
 
-#### Extending Bicep IaC files
+### Extending Bicep IaC files
 
 Once the application is developed, the Bicep files may need to be extended with additional service modules and configuration. We include a script to list the available API versions for each service, including an indicator for latest stable releases.
 
@@ -207,7 +208,7 @@ You can estimate the cost of this project's architecture with [Azure's pricing c
 
 This template has either [Managed Identity](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) or Key Vault built in to eliminate the need for developers to manage these credentials. Applications can use managed identities to obtain Microsoft Entra tokens without having to manage any credentials. Additionally, we have added a [GitHub Action tool](https://github.com/microsoft/security-devops-action) that scans the infrastructure-as-code files and generates a report containing any detected issues. To ensure best practices in your repo we recommend anyone creating solutions based on our templates ensure that the [Github secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) setting is enabled in your repos.
 
-## Resources
+### Resources
 
 (Any additional resources or related projects)
 
