@@ -186,7 +186,7 @@ def check_for_actions_in_workflow_file(repo_path, file_name, actions):
 
 def find_cicd_workflow_file(repo_path):
     # return all yaml files in the /github/workflows folder as a list
-    result = check_folder_existence(
+    result, message = check_folder_existence(
         repo_path, cicd_workflow_folder_path)
     list = []
     if result:
@@ -335,6 +335,8 @@ def check_security_requirements(repo_path, msdo_result_file):
     # check for security action
     msdo_integrated_result = False
     msdo_integrated_messages = []
+    msdo_integrated_messages.append(
+        "Not found security check related actions in the CI/CD pipeline.")
     list = find_cicd_workflow_file(repo_path)
     for file in list:
         result, message = check_for_actions_in_workflow_file(
@@ -347,8 +349,8 @@ def check_security_requirements(repo_path, msdo_result_file):
         final_messages.append(ItemResultFormat.PASS.format(
             message="microsoft/security-devops-action is integrated to the CI/CD pipeline"))
     else:
-        final_messages.append(ItemResultFormat.FAIL.format(message="microsoft/security-devops-action is integrated to the CI/CD pipeline",
-                                                           detail_messages=line_delimiter.join(msdo_integrated_messages)))
+        final_messages.append(ItemResultFormat.WARNING.format(message="microsoft/security-devops-action is integrated to the CI/CD pipeline",
+                                                              detail_messages=line_delimiter.join(msdo_integrated_messages)))
 
     result, message = check_msdo_result(msdo_result_file)
     final_result = final_result and result
