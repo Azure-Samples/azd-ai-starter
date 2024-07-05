@@ -14,7 +14,7 @@ param resourceGroupName string = ''
 @description('The Open AI resource name. If ommited will be generated')
 param openAiName string = ''
 
-param createLocal bool = true
+param createRoleForUser bool = true
 
 var aiConfig = loadYamlContent('./ai.yaml')
 
@@ -43,7 +43,7 @@ module cognitiveServices 'core/ai/cognitiveservices.bicep' = {
   }
 }
 
-module userRoleDataScientist 'core/security/role.bicep' =  if (createLocal) {
+module userRoleDataScientist 'core/security/role.bicep' =  if (createRoleForUser) {
   name: 'user-role-data-scientist'
   scope: rg
   params: {

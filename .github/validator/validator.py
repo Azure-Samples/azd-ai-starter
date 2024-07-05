@@ -5,16 +5,73 @@ import logging
 import yaml
 from sarif import loader
 
-azure_dev_workflow_file_path = ".github/workflows/azure-dev.yml"
-ci_workflow_file_path = ".github/workflows/pr-gate.yml"
-change_log_file_path = "CHANGELOG.md"
-code_of_conduct_file_path = ".github/CODE_OF_CONDUCT.md"
-contributing_file_path = "CONTRIBUTING.md"
-issue_template_file_path = ".github/ISSUE_TEMPLATE.md"
-license_file_path = "LICENSE"
-readme_file_path = "README.md"
-security_file_path = "SECURITY.md"
-infra_yaml_file_path = "azure.yaml"
+
+class FileValidtor:
+    def __init__(self, name, extensionList, rootFolder, folderList, caseSensitive, h2Tags):
+        self.name = name
+        self.extensionList = extensionList
+        self.rootFolder = rootFolder
+        self.folderList = folderList
+        self.caseSensitive = caseSensitive
+        self.h2Tags = h2Tags
+
+    def validate(self):
+        logging.debug(f"Checking for file {self.name} with {self.extensionList} under {
+                      self.rootFolder} in {self.folderList} with case sensitive {self.caseSensitive}..")
+        result = False
+        messages = []
+        potential_name = self.name if self.extensionList[0] == "" else self.name + \
+            "." + self.extensionList[0]
+
+        for root, dirs, files in os.walk(self.rootFolder):
+            # print('{}; {}; {}'.format(root, dirs, files))
+            for folder in self.folderList:
+                candidateFolder = self.rootFolder if folder == "" else os.path.join(
+                    self.rootFolder, folder)
+                if ((self.caseSensitive == False and candidateFolder.lower() == root.lower()) or (self.caseSensitive == True and root == candidateFolder)):
+                    for extension in self.extensionList:
+                        candidateFile = self.name if extension == "" else self.name + "." + extension
+                        for file in files:
+                            if ((self.caseSensitive == False and file.lower() == candidateFile.lower()) or (self.caseSensitive == True and file == candidateFile)):
+                                result = True
+                                logging.debug(f"- {file} is found in {root}.")
+                                submessages = []
+                                if self.h2Tags is not None:
+                                    with open(os.path.join(root, file), 'r') as fileContent:
+                                        content = fileContent.read()
+                                        for tag in self.h2Tags:
+                                            if tag not in content:
+                                                result = result and False
+                                                submessages.append(
+                                                    f"- Error: {tag} is missing in {file}.")
+                                    fileContent.close()
+                                if result:
+                                    messages.append(ItemResultFormat.PASS.format(
+                                        message=f"{potential_name} File"))
+                                else:
+                                    messages.append(ItemResultFormat.FAIL.format(
+                                        message=f"{potential_name} File", detail_messages=line_delimiter.join(submessages)))
+                                return result, line_delimiter.join(messages)
+
+        messages.append(ItemResultFormat.FAIL.format(message=f"{
+                        potential_name} File", detail_messages=f"- Error: {potential_name} file is missing."))
+        return False, line_delimiter.join(messages)
+
+
+root_folder = "."
+github_folder = ".github"
+workflows_folder = "workflows"
+markdown_file_extension = "md"
+yaml_file_extension = "yaml"
+yaml_file_extension2 = "yml"
+azure_dev_workflow_file = "azure-dev"
+code_of_conduct_file = "CODE_OF_CONDUCT"
+contributing_file = "CONTRIBUTING"
+issue_template_file = "ISSUE_TEMPLATE"
+license_file = "LICENSE"
+readme_file = "README"
+security_file = "SECURITY"
+infra_yaml_file = "azure"
 
 infra_folder_path = "infra"
 devcontainer_folder_path = ".devcontainer"
@@ -28,20 +85,6 @@ readme_h2_tags = [
     "## Resources"
 ]
 
-repository_management_files = [
-    readme_file_path,
-    license_file_path,
-    security_file_path,
-    code_of_conduct_file_path,
-    contributing_file_path,
-    issue_template_file_path,
-]
-
-source_code_structure_files = [
-    azure_dev_workflow_file_path,
-#   ci_workflow_file_path,
-    infra_yaml_file_path,
-]
 
 source_code_structure_folders = [
     infra_folder_path,
@@ -236,46 +279,29 @@ def check_folder_existence(repo_path, folder_name):
         return True, line_delimiter.join(messages)
 
 
-def check_file_existence(repo_path, file_name, h2_tags=None):
-    logging.debug(f"Checking for {file_name}...")
-    messages = []
-    if not os.path.isfile(os.path.join(repo_path, file_name)):
-        messages.append(ItemResultFormat.FAIL.format(
-            message=f"{file_name} File", detail_messages=f"- Error: {file_name} file is missing."))
-        return False, line_delimiter.join(messages)
-    else:
-        result = True
-        subMessages = []
-        if h2_tags is not None:
-            with open(os.path.join(repo_path, file_name), 'r') as file:
-                content = file.read()
-                for tag in h2_tags:
-                    if tag not in content:
-                        result = result and False
-                        subMessages.append(
-                            f"- Error: {tag} is missing in {file_name}.")
-            file.close()
-
-        if result == False:
-            messages.append(ItemResultFormat.FAIL.format(
-                message=f"{file_name} File", detail_messages=line_delimiter.join(subMessages)))
-        else:
-            messages.append(ItemResultFormat.PASS.format(
-                message=f"{file_name} File"))
-        return result, line_delimiter.join(messages)
-
-
 def check_repository_management(repo_path, topics):
+
+    repository_management_validators = [
+        FileValidtor(readme_file, [markdown_file_extension],
+                     repo_path, [""], False, readme_h2_tags),
+        FileValidtor(license_file, [markdown_file_extension, ""], repo_path, [
+            ""], False, None),
+        FileValidtor(security_file, [markdown_file_extension], repo_path, [
+            ""], False, None),
+        FileValidtor(code_of_conduct_file, [markdown_file_extension], repo_path, [
+            github_folder, ""], False, None),
+        FileValidtor(contributing_file, [
+            markdown_file_extension], repo_path, ["", github_folder], False, None),
+        FileValidtor(issue_template_file, [markdown_file_extension], repo_path, [
+            github_folder], False, None)
+    ]
+
     final_result = True
     final_messages = [""]
     final_messages.append("## Repository Management:")
 
-    for file_name in repository_management_files:
-        tags_list = None
-        if file_name == readme_file_path:
-            tags_list = readme_h2_tags
-
-        result, message = check_file_existence(repo_path, file_name, tags_list)
+    for validator in repository_management_validators:
+        result, message = validator.validate()
         final_result = final_result and result
         final_messages.append(message)
 
@@ -288,16 +314,18 @@ def check_repository_management(repo_path, topics):
 
 
 def check_source_code_structure(repo_path):
+    source_code_structure_validators = [
+        FileValidtor(azure_dev_workflow_file, [yaml_file_extension, yaml_file_extension2], repo_path, [
+            os.path.join(github_folder, workflows_folder)], False, None),
+        FileValidtor(infra_yaml_file, [
+            yaml_file_extension, yaml_file_extension2], repo_path, [""], False, None),
+    ]
     final_result = True
     final_messages = [""]
     final_messages.append("## Source code structure and conventions:")
 
-    for file_name in source_code_structure_files:
-        tags_list = None
-        if file_name == readme_file_path:
-            tags_list = readme_h2_tags
-
-        result, message = check_file_existence(repo_path, file_name, tags_list)
+    for validator in source_code_structure_validators:
+        result, message = validator.validate()
         final_result = final_result and result
         final_messages.append(message)
 
