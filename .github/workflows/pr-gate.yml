@@ -20,88 +20,32 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Install AZD
-        uses: Azure/setup-azd@v1.0.0
-
-      - name: Install Nodejs
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Set up Python
-        # This is the version of the action for setting up Python, not the Python version.
-        uses: actions/setup-python@v5
-        with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.x'
-          # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x64'
-
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Installation and Setup
+      - name: Get PR branch URL
+        id: get_pr_branch_url
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r .github/validator/requirements.txt
-          if [ -d "./hooks" ] && [ "$(ls -A ./hooks/*.sh 2>/dev/null)" ]; then
-            chmod +x ./hooks/*.sh
-          else
-            echo "No hooks directory or no .sh files found in hooks directory"
-          fi
+          PR_REPO_URL="https://github.com/${{ github.event.pull_request.head.repo.full_name }}"
+          PR_BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+          echo "PR_REPO_URL=${PR_REPO_URL}" >> $GITHUB_ENV
+          echo "PR_BRANCH_NAME=${PR_BRANCH_NAME}" >> $GITHUB_ENV
 
-      - name: Run Microsoft Security DevOps Analysis
-        uses: microsoft/security-devops-action@v1
-        id: msdo
+      - uses: actions/checkout@v4
+      - id: validation
+        uses: microsoft/template-validation-action@v0.0.2
         with:
-          tools: templateanalyzer
-
-      - name: Upload results to Security tab
-        continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ steps.msdo.outputs.sarifFile }}
-
-      - name: Get repository topics
-        id: get_repo_topics
+          repositoryURL: ${{ env.PR_REPO_URL }}
+          branch: ${{ env.PR_BRANCH_NAME }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          topics_list=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/$GITHUB_REPOSITORY/topics | jq -r '.names | join(",")')
-          echo "topics=\"$topics_list\"" >> $GITHUB_ENV
-
-      - name: Set environment name with timestamp
-        id: set_env_name
-        run: |
-          current_time=$(date +%m%d%H%M)
-          azure_env_name="${{ vars.AZURE_ENV_NAME }}-$current_time"
-          echo "AZURE_ENV_NAME=$azure_env_name" >> $GITHUB_ENV
-
-      - name: Log in with Azure (Federated Credentials)
-        if: ${{ env.AZURE_CLIENT_ID != '' }}
-        run: |
-          azd auth login `
-            --client-id "$Env:AZURE_CLIENT_ID" `
-            --federated-credential-provider "github" `
-            --tenant-id "$Env:AZURE_TENANT_ID"
-        shell: pwsh
-
-      - name: Run validation
-        run: python .github/validator/validator.py . --azdup --azddown --output .github/validator/output.log --topics ${{ env.TOPICS }} --msdoresult ${{ steps.msdo.outputs.sarifFile }} --debug
-        env:
-          AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
-          AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          CREATE_ROLE_FOR_USER: false
-          TOPICS: ${{ env.topics }}
-
+          PR_BRANCH_NAME: ${{ env.PR_BRANCH_NAME }}
+          PR_REPO_URL: ${{ env.PR_REPO_URL }}
+  
       - name: Read file content
         if: always()
         id: read_validation_result
         run: |
-          FILE_CONTENT=$(cat .github/validator/output.log)
+          cat ${{ steps.validation.outputs.resultFile }}
+          FILE_CONTENT=$(cat ${{ steps.validation.outputs.resultFile }})
           echo "validation_result<<EOF" >> $GITHUB_ENV
           echo "$FILE_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
