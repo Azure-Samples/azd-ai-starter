@@ -11,9 +11,11 @@ description: Creates an Azure AI Service and deploys the specified models.
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
+> [!NOTE]
+> This repository is a starter kit to use as a base to build templates for AI powered applications. It has all the necessary artifact to conform with [standards](https://github.com/Azure-Samples/azd-template-artifacts) and pass the mandatory validation for [publication](https://github.com/Azure-Samples/azd-template-artifacts/blob/main/publishing-guidelines.md) as part of our official collections. If you want to automatically scaffold a template based on this one, instead of cloning it, you can use the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/) and run `azd init -t azd-ai-starter`
+
 > [!IMPORTANT]
-> This is a standard readme file defining the required structure for template validation. Update as required, including replacing all instances of [Project Name] with your project's name, and remove this notice.
-> Please make sure to read the [how to](./HOWTO.md) documentation, to learn more about additional setup steps, standardization, conventions and validation steps.
+> The content below represents a standard readme file defining the required structure for template validation. Update as required, including replacing all instances of [Project Name] with your project's name, and remove this notice and the notice and metadata above.
 
 
 # [Project Name]
