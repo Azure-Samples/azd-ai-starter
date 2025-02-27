@@ -5,7 +5,6 @@ deployments:
     model:
       format: OpenAI
       name: gpt-35-turbo
-      version: "0613"
     sku:
       name: Standard
       capacity: 20
@@ -13,7 +12,6 @@ deployments:
     model:
       format: OpenAI
       name: text-embedding-ada-002
-      version: "2"
     sku:
       name: "Standard"
       capacity: 20

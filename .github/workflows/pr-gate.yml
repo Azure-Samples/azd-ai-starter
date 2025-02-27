@@ -31,14 +31,15 @@ jobs:
           echo "PR_BRANCH_NAME=${PR_BRANCH_NAME}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
-      - id: validation
-        uses: microsoft/template-validation-action@v0.0.2
-        with:
-          repositoryURL: ${{ env.PR_REPO_URL }}
-          branch: ${{ env.PR_BRANCH_NAME }}
+      - uses: microsoft/template-validation-action@Latest
+        id: validation
         env:
-          PR_BRANCH_NAME: ${{ env.PR_BRANCH_NAME }}
-          PR_REPO_URL: ${{ env.PR_REPO_URL }}
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+          AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
       - name: Read file content
         if: always()
@@ -54,6 +55,6 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMENT_BODY: ${{ env.validation_result }}
+          COMMENT_BODY: ${{ steps.validation.outputs.resultFile }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "${{ env.COMMENT_BODY }}"
