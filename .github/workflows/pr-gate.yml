@@ -30,9 +30,9 @@ jobs:
           echo "PR_REPO_URL=${PR_REPO_URL}" >> $GITHUB_ENV
           echo "PR_BRANCH_NAME=${PR_BRANCH_NAME}" >> $GITHUB_ENV
 
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: validation
-        uses: microsoft/template-validation-action@6b1b823b9a6a32c4c7e52f63ac454912a3b41963 # v0.0.2
+        uses: microsoft/template-validation-action@bae4895d0a8abd4f0d5aad68ae8647b3027f4c91 # v0.4.4
         with:
           repositoryURL: ${{ env.PR_REPO_URL }}
           branch: ${{ env.PR_BRANCH_NAME }}
