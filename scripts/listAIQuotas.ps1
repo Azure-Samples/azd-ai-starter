@@ -45,8 +45,19 @@ function Get-Quotas() {
     foreach ($location in $locations) {
         Write-Host "Fetching quotas for location $location..."
         try {
-            $usages = (az cognitiveservices usage list --location $location) | ConvertFrom-Json
-            $models = (az cognitiveservices model list --location $location) | ConvertFrom-Json
+            $usages = (az cognitiveservices usage list --location $location --query '[].{name: name.value, currentValue: currentValue, limit: limit}' ) | ConvertFrom-Json
+            $models = (az cognitiveservices model list --location $location --query '[].{name: model.name, sku: model.skus[0].name, kind: kind, version: model.version}' ) | ConvertFrom-Json
+
+            # Build a lookup map of models keyed by kind.sku.name -> array of versions for fast lookups
+            $modelLookup = @{}
+            foreach ($m in $models) {
+                $sku = ($m.sku)
+                $key = "$($m.kind).$($sku).$($m.name)"
+                if (-not $modelLookup.ContainsKey($key)) { $modelLookup[$key] = @() }
+                if (-not ($modelLookup[$key] -contains $m.version)) {
+                    $modelLookup[$key] += $m.version
+                }
+            }
         }
         catch {
             Write-Host "Failed to fetch quotas for location $location : $_"
@@ -61,14 +72,13 @@ function Get-Quotas() {
                 continue
             }
 
-            # Find the candidate model in the list of models and get the available versions
+            # Find the candidate model versions quickly using the pre-built lookup
             $available_versions = @()
-            $models | ForEach-Object {
-                $model = $_
-                $skuMatch = $model.model.skus | Where-Object { $_.name -eq $candidate.sku }
-                if ($model.model.name -eq $candidate.name -and $model.kind -eq $candidate.kind -and $skuMatch) {
-                    if ($candidate.versions -contains '*' -or $candidate.versions -contains $model.model.version) {
-                        $available_versions += $model.model.version
+            $lookupKey = "$($candidate.kind).$($candidate.sku).$($candidate.name)"
+            if ($modelLookup.ContainsKey($lookupKey)) {
+                foreach ($ver in $modelLookup[$lookupKey]) {
+                    if ($candidate.versions -contains '*' -or $candidate.versions -contains $ver) {
+                        $available_versions += $ver
                     }
                 }
             }

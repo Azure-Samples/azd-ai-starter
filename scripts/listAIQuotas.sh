@@ -22,6 +22,26 @@ get_quotas() {
         
         local usages=$(az cognitiveservices usage list --location $location --query "[].{name: name.value, currentValue: currentValue, limit: limit}" -o tsv)
         local models=$(az cognitiveservices model list --location $location --query "[].{name: model.name, sku: model.skus[0].name, kind: kind, version: model.version}" -o tsv)
+
+        # Build associative array: key=kind.sku.name value=comma-separated-versions
+        declare -A model_map
+        IFS=$'\n'
+        for m in $models; do
+            model_name=$(echo $m | cut -f1)
+            sku=$(echo $m | cut -f2)
+            kind=$(echo $m | cut -f3)
+            version=$(echo $m | cut -f4)
+            key="$kind.$sku.$model_name"
+            if [ -z "${model_map[$key]:-}" ]; then
+                model_map[$key]="$version"
+            else
+                # append if not present
+                if ! echo ",${model_map[$key]}", | grep -q ",$version,"; then
+                    model_map[$key]="${model_map[$key]},$version"
+                fi
+            fi
+        done
+        unset IFS
         
         IFS=$'\n'
         for usage in $usages; do
@@ -44,19 +64,18 @@ get_quotas() {
                     continue
                 fi
                 
-                # Find the candidate model in the list of models and get the available versions
+                # Lookup available versions from model_map
                 available_versions=()
-                for model in $models; do
-                    local model_name=$(echo $model | cut -f1)
-                    local sku=$(echo $model | cut -f2)
-                    local kind=$(echo $model | cut -f3)
-                    local version=$(echo $model | cut -f4)
-                    if [[  $model_fullname == "$kind.$sku.$model_name" ]]; then
+                key="$model_fullname"
+                versions_str="${model_map[$key]:-}"
+                if [ -n "$versions_str" ]; then
+                    IFS="," read -ra all_versions <<< "$versions_str"
+                    for version in "${all_versions[@]}"; do
                         if [[ "$versions" == *"*"* ]] || echo "$versions" | grep -q -w "$version"; then
                             available_versions+=("$version")
                         fi
-                    fi
-                done
+                    done
+                fi
                 
                 # Skip if no available versions
                 if [ ${#available_versions[@]} -eq 0 ]; then
